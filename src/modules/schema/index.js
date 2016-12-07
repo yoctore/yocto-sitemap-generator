@@ -14,7 +14,7 @@ var joi    = require('joi');
  * @author : Cédric BALARD <cedric@yocto.re>
  * @copyright : Yocto SAS, All right reserved
  *
- * @class YMongoose
+ * @module Schema
  */
 function Schema (l) {
 
@@ -70,21 +70,27 @@ Schema.prototype.validate = function (data, schemaName) {
 Schema.prototype.getSchema = function (schemaName) {
 
   var paramRules = joi.object().optional().keys({
-    changeFreq  : joi.string().empty().allow([ 'always', 'hourly', 'daily', 'weekly',
+    changefreq  : joi.string().empty().allow([ 'always', 'hourly', 'daily', 'weekly',
     'monthly', 'yearly', 'never' ]),
     priority    : joi.number().optional().min(0).max(1),
     lastmod     : joi.string().optional().trim().empty()
   }).default({});
 
+  // Default urlset value
+  var defaultUrlset = {
+    xmlns           : 'http://www.sitemaps.org/schemas/sitemap/0.9',
+    xsi             : 'http://www.w3.org/2001/XMLSchema-instance',
+    schemaLocation  : 'http://www.sitemaps.org/schemas/sitemap/0.9 ' +
+    'http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd'
+  };
+
   // All schemas
   var schemas = {
-    paramsRules     : joi.object().optional().keys({
-      changeFreq  : joi.string().empty().allow([ 'always', 'hourly', 'daily', 'weekly',
-      'monthly', 'yearly', 'never' ]),
-      priority    : joi.number().optional().min(0).max(1),
-      lastmod     : joi.string().optional().trim().empty()
-    }).default({}),
     load            : joi.object().required().keys({
+      pathFile  : joi.string().optional().trim().empty().default('sitemap.xml'),
+      scheduler : joi.object().optional().keys({
+        cronRule : joi.string().required().trim().empty(),
+      }).default({}),
       generator : joi.object().required().keys({
         url     : joi.string().trim().required().empty(),
         options : joi.object().optional().keys({
@@ -93,6 +99,12 @@ Schema.prototype.getSchema = function (schemaName) {
         }).default({})
       }),
       rules     : joi.object().optional().keys({
+        urlset    : joi.object().optional().keys({
+          xmlns           : joi.string().trim().empty().default(defaultUrlset.xmlns).allow(null),
+          xsi             : joi.string().trim().empty().default(defaultUrlset.xsi).allow(null),
+          schemaLocation  : joi.string().trim().empty().default(defaultUrlset.schemaLocation)
+          .allow(null),
+        }).default(defaultUrlset),
         default   : joi.object().optional().keys({
           params : paramRules
         }).default({

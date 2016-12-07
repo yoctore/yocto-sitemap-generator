@@ -1,7 +1,5 @@
-
 var factory = require('../src/modules/factory')();
 var utils = require('yocto-utils');
-
 
 var sitemap = {
   urlset: {
@@ -27,9 +25,14 @@ var sitemap = {
 var baseUrl = 'http://wwww.yocto.re';
 
 var config = {
+  urlset : {
+    xmlns           : 'http://www.sitemaps.org/schemas/sitemap/0.9',
+    xsi             : 'http://www.w3.org/2001/XMLSchema-instance',
+    schemaLocation  : 'http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd'
+  },
   default : {
     params : {
-      changeFreq : 'weekly',
+      changefreq : 'weekly',
       priority   : 0.85
     }
   },
@@ -37,15 +40,15 @@ var config = {
     {
       regex   : 'nos-travaux',
       params  : {
-        changeFreq : 'daily',
+        changefreq : 'daily',
         priority   : 0.5
       }
     },
     {
       regex   : 'nos-services',
       params  : {
-        changeFreq : 'daily',
-        priority   : 1.5
+        changefreq : 'daily',
+        priority   : 0.8
       }
     }
   ],
@@ -54,9 +57,10 @@ var config = {
   ]
 };
 
-factory.remapSitemap(sitemap, config, baseUrl).then(function (value) {
+factory.remapSitemap(sitemap, config, baseUrl, true).then(function (value) {
 
-  console.log('\n --> value : ', utils.obj.inspect(value));
+  console.log('\n --> value : \n\n', value);
+
 }).catch(function (error) {
 
   console.log('\n --> error : ', error)

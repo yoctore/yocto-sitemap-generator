@@ -43,11 +43,14 @@
   "homepage": "https://github.com/yoctore/yocto-sitemap-generator#readme",
   "dependencies": {
     "async": "^2.1.4",
+    "cron": "^1.1.1",
     "joi": "^10.0.2",
     "lodash": "^4.17.2",
+    "node-schedule": "^1.2.0",
     "q": "^1.4.1",
     "sitemap-generator": "^5.0.0",
     "xml2json": "^0.10.0",
+    "xmlbuilder": "^8.2.2",
     "yocto-logger": "^1.1.6",
     "yocto-utils": "^1.2.8"
   },

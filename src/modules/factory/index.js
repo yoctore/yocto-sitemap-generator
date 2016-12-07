@@ -5,6 +5,7 @@ var _             = require('lodash');
 var Q             = require('q');
 var xmlParser     = require('xml2json');
 var async         = require('async');
+var builder       = require('xmlbuilder');
 
 /**
  *
@@ -14,7 +15,7 @@ var async         = require('async');
  * @author : Cédric BALARD <cedric@yocto.re>
  * @copyright : Yocto SAS, All right reserved
  *
- * @class YMongoose
+ * @module Factory
  */
 function Factory (l) {
 
@@ -35,7 +36,7 @@ function Factory (l) {
  * @param  {String} baseUrl the base url to remove for regexp matching
  * @return {Object} promise of this method
  */
-Factory.prototype.remapSitemap = function (sitemap, config, baseUrl) {
+Factory.prototype.remapSitemap = function (sitemap, config, baseUrl, convertToXml) {
   // create async process
   var deferred  = Q.defer();
 
@@ -61,12 +62,67 @@ Factory.prototype.remapSitemap = function (sitemap, config, baseUrl) {
     // override with new builded array and compact to remove null value
     sitemap.urlset.url = _.compact(finalUrls);
 
-    // resolve sitemap
-    deferred.resolve(sitemap);
-  });
+    // check if sitemap should be converted
+    if (_.isUndefined(convertToXml) || convertToXml === false) {
+      // resolve sitemap
+      return deferred.resolve(sitemap);
+    }
+
+    // return sitemap to xml
+    deferred.resolve(this.buildXml(sitemap, config));
+  }.bind(this));
 
   // return result of control flow
   return deferred.promise;
+};
+
+/**
+ * Factory that convert an sitemap object to an xml file
+ *
+ * @param  {Object} sitemap sitemap that was generated
+ * @param  {Object} config config use to add params
+ * @return {String} the sitemap in xml
+ */
+Factory.prototype.buildXml = function (sitemap, config) {
+  // xml base
+  var xml = builder.create('urlset', { version : '1.0', encoding : 'UTF-8' });
+
+  // array for mapping attributes
+  var attributes = [
+    {
+      key   : 'xmlns',
+      path  : 'xmlns'
+    },
+    {
+      key   : 'xsi',
+      path  : 'xmlns:xsi'
+    },
+    {
+      key   : 'schemaLocation',
+      path  : 'xsi:schemaLocation'
+    },
+  ];
+
+  // Check if has optopnal xmlns arguments
+  _.each(attributes, function (v) {
+    // retrieve args
+    var value = _.get(config, 'urlset.' + v.key);
+
+    // check if value exist
+    if (!_.isUndefined(value) && !_.isNull(value) && !_.isEmpty(value)) {
+      // set attribute
+      xml.att(v.path, value);
+    }
+  });
+
+  // Read each url to rebuild them
+  _.each(sitemap.urlset.url, function (url) {
+    // add element
+    xml.ele('url').ele(url);
+  });
+
+  // create and return the remaped xml
+  return xml.end({ pretty : true, indent : '  ', newline : '\n' });
 };
 
 /**

@@ -14,7 +14,7 @@ var SitemapGenerator  = require('sitemap-generator');
  * @author : Cédric BALARD <cedric@yocto.re>
  * @copyright : Yocto SAS, All right reserved
  *
- * @class YMongoose
+ * @module Generator
  */
 function Generator (l) {
 
