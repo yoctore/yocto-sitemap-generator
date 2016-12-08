@@ -117,7 +117,7 @@ sitemapGenerator.load(config).then(function (value) {
 sitemapGenerator.process(true).then(function (sitemap) {
   // ge success sitemap to xml
   console.log(value);
-}).catch(function (error) {
+}).catch(function (sitemap) {
   // loading failed
   console.log(error);
 });
@@ -133,7 +133,7 @@ sitemapGenerator.process(true).then(function (sitemap) {
 // Enable scheduler that will generate automatically the sitemap
 sitemapGenerator.enableScheduler().then(function (sitemap) {
   // enable succes
-  console.log(value);
+  console.log(sitemap);
 }).catch(function (error) {
   // enable failed
   console.log(error);
